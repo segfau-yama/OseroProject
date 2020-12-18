@@ -37,7 +37,7 @@ def run(connection, address):
         try:
             if not barrier.broken:
                 #接続完了まで10待つ
-                barrier.wait(2)
+                barrier.wait(10)
         except threading.BrokenBarrierError:
             connection.send("ゲーム開始できないため、退出しました。".encode("UTF-8"))
             connection.close()
@@ -58,5 +58,6 @@ if __name__ == '__main__':
             break
         thread = threading.Thread(target=run,args=(conn, addr), daemon=True)
         players.append((conn, addr))
+        print('player {}さんが参加しました。'.format(len(players)))
         thread.start()
 
