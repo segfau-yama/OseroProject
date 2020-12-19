@@ -1,7 +1,8 @@
 import socket
 import threading
-import sys
+import queue
 
+#
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "127.0.0.1"
 port = 55580
@@ -11,11 +12,13 @@ sock.listen()
 players = []
 
 # オセロだから2人
-num = 2
+total_player = 2
 
-# クソバリア。引数受け取ってくれ
+# こみ上げる怒り
+# ファッキンクソバリア。引数受け取ってくれ
+# バリアスレッド処理。オセロ対戦はここで実装する
 def start_game():
-    print('{}人になったため、ゲーム開始。'.format(num))
+    print('{}人になったため、ゲーム開始。'.format(total_player))
     print("loop")
     # ここにconnとaddr入れたいのにできないよ
     # オセロ未実装。チャットでテストする
@@ -36,14 +39,15 @@ def start_game():
 
 # バリアインスタンスを作る
 lock = threading.Lock()
-barrier = threading.Barrier(num, action=start_game)
+barrier = threading.Barrier(total_player, action=start_game)
 
-# 待機ルーム
+# 待機ロビー
 def run(connection, address):
+        # 接続完了まで10秒待つ
         try:
             if not barrier.broken:
-                # 接続完了まで10待つ
-                barrier.wait(2)
+                barrier.wait(10)
+        # 例外処理。10秒待っても人が入らなかった場合、接続を終了する。
         except threading.BrokenBarrierError:
             connection.send("ゲーム開始できないため、退出しました。".encode("UTF-8"))
             connection.close()
@@ -52,17 +56,17 @@ def run(connection, address):
 
 # メイン
 if __name__ == '__main__':
-
     while True:
+        # 接続要求を受信。アドレスと接続情報を取得
         try:
-            # 接続要求を受信
             conn, addr = sock.accept()
-
+        # エラー処理。キーボード入力があればプログラムを閉じる
         except KeyboardInterrupt:
             sock.close()
             exit()
             break
 
+        # プレイヤー追加処理。スレッドで待機ロビーを作る
         thread = threading.Thread(target=run,args=(conn, addr), daemon=True)
         players.append((conn, addr))
         print('player {}さんが参加しました。'.format(len(players)))

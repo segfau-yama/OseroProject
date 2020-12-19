@@ -14,6 +14,7 @@ while(osero.flag_fin()):
     while True:
         i = int(input("i:"))
         j = int(input("j:"))
+        # 石の場所が正しければループを抜ける
         if osero.check_plc(i, j):
             break
 
