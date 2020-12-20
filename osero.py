@@ -21,12 +21,11 @@ class Osero:
     #手番の表示
     def show_player(self):
         if self.player == -1:
-            print("先手(黒)の手番です")
+            return "先手(黒)の手番です"
         elif self.player == 1:
-            print("後手(白)の手番です")
+            return "後手(白)の手番です"
         else:
-            print("error!")
-        return 0
+            return "error!"
 
     #マスの探索
     def check_dir(self, i, j, dir_i, dir_j):
