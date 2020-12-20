@@ -19,7 +19,6 @@ clients = []
 osero = Osero()
 total_player = 2
 count = 1
-room = []
 # 盤面の生成
 osero.make_board()
 # バリアインスタンスを作る
@@ -28,35 +27,43 @@ barrier = threading.Barrier(total_player, timeout=5)
 
 # 対戦ルームオセロ処理
 def match():
+    room = []
     logging.debug('start')
+    print("start")
     # 終了までループ
     for i in range(2):
         room.append(q.get())
         print(room[i])
-    name = 1
-    while (osero.flag_fin()):
-        name = int(-0.5 * Osero.player + 0.5)
-        print("player:{}".format(Osero.player))
-        room[0].send((str(0) + str(name) + "\n" + str(osero.board)).encode())
-        room[1].send((str(1) + str(name) + "\n" + str(osero.board)).encode())
+    try:
+        while (osero.flag_fin()):
+            name = int(-0.5 * Osero.player + 0.5)
+            print("player:{}".format(Osero.player))
+            room[0].send((str(0) + str(name) + "\n" + str(osero.board)).encode())
+            room[1].send((str(1) + str(name) + "\n" + str(osero.board)).encode())
 
-        #クライアント
-        i = room[name].recv(1024)
-        j = room[name].recv(1024)
-        i = int(i.decode())
-        j = int(j.decode())
-        print("i:{} j:{}".format(i, j))
-        # 石を配置する
-        osero.place_stn(i, j)
-        # 手番を入れ替える
-        Osero.player *= -1
+            #クライアント
+            i = room[name].recv(1024)
+            j = room[name].recv(1024)
+            i = int(i.decode())
+            j = int(j.decode())
+            print("i:{} j:{}".format(i, j))
+            # 石を配置する
+            osero.place_stn(i, j)
+            # 手番を入れ替える
+            Osero.player *= -1
 
 
-    # 盤面の表示
-    print(osero.board)
-    # 勝利判定
-    osero.judge_board()
-
+        # 盤面の表示
+        print(osero.board)
+        # 勝利判定
+        osero.judge_board()
+    except Exception as e:
+        print(e)
+        room[0].close()
+        room[1].close()
+        exit(1)
+    except room[0] == room[1]:
+        print("errrrrrrrrrrrrrr")
 
 def roby(connection, address):
     logging.debug('start')
@@ -67,7 +74,7 @@ def roby(connection, address):
             q.put(connection)
             # バリアとおったやつだけ実行
             if start == 0:
-                m = threading.Thread(target=match, args=(), daemon=True)
+                m = threading.Thread(target=match, daemon=True)
                 m.start()
     # 送受信処理
     except threading.BrokenBarrierError:
