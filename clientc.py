@@ -18,12 +18,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # サーバにメッセージを送る
         if my == now_player:
             while True:
-                i = int(input("i:"))
-                j = int(input("j:"))
-                if 1 <= i <= 8 and 1 <= j <= 8:
+                i = input("i:")
+                j = input("j:")
+                if i.isdecimal() and j.isdecimal():
                     break
-
             s.send(str(i).encode())
             s.send(str(j).encode())
+
         else:
             print("wait....")

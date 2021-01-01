@@ -19,14 +19,14 @@ clients = []
 osero = Osero()
 total_player = 2
 count = 1
-# 盤面の生成
-osero.make_board()
 # バリアインスタンスを作る
 lock = threading.Lock()
 barrier = threading.Barrier(total_player, timeout=5)
 
 # 対戦ルームオセロ処理
 def match():
+    # 盤面の生成
+    osero.make_board()
     room = []
     logging.debug('start')
     print("start")
@@ -41,18 +41,20 @@ def match():
             room[0].send((str(0) + str(name) + "\n" + str(osero.board)).encode())
             room[1].send((str(1) + str(name) + "\n" + str(osero.board)).encode())
 
-            #クライアント
-            i = room[name].recv(1024)
-            j = room[name].recv(1024)
-            i = int(i.decode())
-            j = int(j.decode())
-            print("i:{} j:{}".format(i, j))
+            # クライアントからデータを受け取る
+            while True:
+                i = room[name].recv(1024)
+                j = room[name].recv(1024)
+                i = int(i.decode())
+                j = int(j.decode())
+                print("i:{} j:{}".format(i, j))
+                if osero.check_plc(i, j):
+                    break
+                #room[name].send()
             # 石を配置する
             osero.place_stn(i, j)
             # 手番を入れ替える
             Osero.player *= -1
-
-
         # 盤面の表示
         print(osero.board)
         # 勝利判定
@@ -61,7 +63,6 @@ def match():
         print(e)
         room[0].close()
         room[1].close()
-        exit(1)
     except room[0] == room[1]:
         print("errrrrrrrrrrrrrr")
 
