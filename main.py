@@ -22,7 +22,6 @@ count = 1
 # バリアインスタンスを作る
 lock = threading.Lock()
 barrier = threading.Barrier(total_player, timeout=5)
-
 # 対戦ルームオセロ処理
 def match():
     # 盤面の生成
@@ -37,6 +36,7 @@ def match():
     try:
         while (osero.flag_fin()):
             name = int(-0.5 * Osero.player + 0.5)
+            not_name = not bool(name)
             print("player:{}".format(Osero.player))
             room[0].send((str(0) + str(name) + "\n" + str(osero.board)).encode())
             room[1].send((str(1) + str(name) + "\n" + str(osero.board)).encode())
@@ -50,7 +50,8 @@ def match():
                 print("i:{} j:{}".format(i, j))
                 if osero.check_plc(i, j):
                     break
-                #room[name].send()
+                else:
+                    room[name].send(str(True).encode())
             # 石を配置する
             osero.place_stn(i, j)
             # 手番を入れ替える
@@ -58,13 +59,17 @@ def match():
         # 盤面の表示
         print(osero.board)
         # 勝利判定
-        osero.judge_board()
+        for i in range(2):
+            room[i].send(str(osero.judge_board()))
+        room[0].close()
+        room[1].close()
+
     except Exception as e:
         print(e)
         room[0].close()
         room[1].close()
     except room[0] == room[1]:
-        print("errrrrrrrrrrrrrr")
+        print("error")
 
 def roby(connection, address):
     logging.debug('start')

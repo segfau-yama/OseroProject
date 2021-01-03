@@ -8,6 +8,7 @@ class Osero:
     player = -1
     #盤面の生成
     def make_board(self):
+        self.board = np.zeros(100).reshape(10, 10)
         for i in range(0,10):
             self.board[0][i] = 2
             self.board[9][i] = 2
@@ -70,17 +71,22 @@ class Osero:
 
     #勝敗判定
     def judge_board(self):
-        for i in range(1,9):
-            for j in range(1,9):
+        count_b = 0
+        count_w = 0
+        for i in range(1, 9):
+            for j in range(1, 9):
                 if self.board[i][j] == -1:
-                    count_b =+ 1
+                    count_b += 1
                 elif self.board[i][j] == 1:
-                    count_w =+ 1
+                    count_w += 1
         print("先手:{} 後手:{}".format(count_b, count_w))
         if count_b > count_w:
             print("先手の勝利")
+            return "0", count_b, count_w
         elif count_w > count_b:
             print("後手の勝利")
+            return "1", count_b, count_w
         else:
             print("引き分け")
+            return "2", count_b, count_w
 
