@@ -17,13 +17,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         data = s.recv(1024)
         data_d = data.decode()
         data_d = data_d.split(",")
-        print(data_d)
         flag = int(data_d[0])
         if flag == 5:
             my = int(data_d[1])
             now_player = int(data_d[2])
-            print("now_player:{}".format(now_player))
-            print("my:{}".format(my))
+            #print("now_player:{}".format(now_player))
+            #print("my:{}".format(my))
             osero_board = data_d[3:]
             re_board = replace(osero_board)
             for i in range(100):
@@ -33,8 +32,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print()
         elif flag == 3:
             now_player = int(data_d[1])
-            print("now_player:{}".format(now_player))
-            print("my:{}".format(my))
+            #print("now_player:{}".format(now_player))
+            #print("my:{}".format(my))
             osero_board = data_d[2:]
             re_board = replace(osero_board)
             for i in range(100):
@@ -56,11 +55,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # サーバにメッセージを送る
         if my == now_player or flag == 6:
             while True:
+                print("あなたの番です。")
                 i = input("i:")
                 j = input("j:")
                 if re.fullmatch("[1-8]", i) and re.fullmatch("[1-8]", j):
                     break
+                else:
+                    print("場所が違います。")
             s.send(str(i).encode())
             s.send(str(j).encode())
         else:
-            print("wait....")
+            print("思考中・・・")

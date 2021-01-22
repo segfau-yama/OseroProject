@@ -24,16 +24,13 @@ barrier = threading.Barrier(total_player, timeout=5)
 # 対戦ルームオセロ処理
 def match():
     osero = Osero()
-    print("create")
     # 盤面の生成
     osero.make_board()
     room = []
     now_turn = 1
     logging.debug('start')
-    print("start")
     for i in range(2):
         room.append(q.get())
-        print(room[i])
     # 終了までループ
     try:
         while (osero.flag_fin()):
