@@ -3,6 +3,7 @@ import threading
 import queue
 from osero import Osero
 import logging
+import re
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s: %(message)s')
 # サーバー関連
@@ -14,33 +15,38 @@ sock.bind(argument)
 sock.listen()
 q = queue.Queue()
 clients = []
-
 # オセロ関連
-osero = Osero()
 total_player = 2
-count = 1
 # バリアインスタンスを作る
 lock = threading.Lock()
 barrier = threading.Barrier(total_player, timeout=5)
+
 # 対戦ルームオセロ処理
 def match():
+    osero = Osero()
+    print("create")
     # 盤面の生成
     osero.make_board()
     room = []
+    now_turn = 1
     logging.debug('start')
     print("start")
-    # 終了までループ
     for i in range(2):
         room.append(q.get())
         print(room[i])
+    # 終了までループ
     try:
         while (osero.flag_fin()):
-            name = int(-0.5 * Osero.player + 0.5)
-            not_name = not bool(name)
-            print("player:{}".format(Osero.player))
-            room[0].send((str(0) + str(name) + "\n" + str(osero.board)).encode())
-            room[1].send((str(1) + str(name) + "\n" + str(osero.board)).encode())
-
+            name = int(-0.5 * osero.player + 0.5)
+            print("player:{}".format(osero.player))
+            #カンマで区切ったデータを送信
+            new_board = re.sub("\]|\[|\s","",str(osero.board))
+            if now_turn == 1:
+                for i in range(2):
+                    room[i].send(("5," + str(i) + "," + str(name) + "," + str(new_board)).encode())
+            else:
+                for i in range(2):
+                    room[i].send(("3," + str(name) + "," + str(new_board)).encode())
             # クライアントからデータを受け取る
             while True:
                 i = room[name].recv(1024)
@@ -51,19 +57,20 @@ def match():
                 if osero.check_plc(i, j):
                     break
                 else:
-                    room[name].send(str(True).encode())
+                    room[name].send("6".encode())
             # 石を配置する
             osero.place_stn(i, j)
             # 手番を入れ替える
-            Osero.player *= -1
+            osero.player *= -1
+
+            now_turn += 1
         # 盤面の表示
         print(osero.board)
         # 勝利判定
+        judge_board = re.sub("\)|\(|\s", "", str(osero.judge_board()))
         for i in range(2):
-            room[i].send(str(osero.judge_board()))
-        room[0].close()
-        room[1].close()
-
+            print(judge_board)
+            room[i].send(str(judge_board).encode())
     except Exception as e:
         print(e)
         room[0].close()
