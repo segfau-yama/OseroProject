@@ -43,12 +43,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print()
         elif flag == 4:
             winner = int(data_d[1])
+            black = int(data_d[2])
+            white = int(data_d[3])
+            osero_board = data_d[4:]
+            re_board = replace(osero_board)
             if winner == 1:
                 print("先手の勝ち")
             elif winner == 0:
                 print("後手の勝ち")
             else:
                 print("引き分け")
+            print("黒:{} 白:{}".format(black, white))
+            for i in range(100):
+                if i % 10 == 0 and i != 0:
+                    print()
+                print(re_board[i] + "　", end='')
+            print()
             s.close()
             s.close()
             break

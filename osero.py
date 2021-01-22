@@ -16,7 +16,7 @@ class Osero:
         self.board[4][5] = -1
         self.board[5][4] = -1
 
-    # 手番の表示
+    # 手番の表示(つかってない)
     def show_player(self):
         if self.player == -1:
             return "先手(黒)の手番です"

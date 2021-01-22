@@ -40,10 +40,10 @@ def match():
             new_board = re.sub("\]|\[|\s","",str(osero.board))
             if now_turn == 1:
                 for i in range(2):
-                    room[i].send(("5," + str(i) + "," + str(name) + "," + str(new_board)).encode())
+                    room[i].send(("5," + str(i) + "," + str(name) + "," + new_board).encode())
             else:
                 for i in range(2):
-                    room[i].send(("3," + str(name) + "," + str(new_board)).encode())
+                    room[i].send(("3," + str(name) + "," + new_board).encode())
             # クライアントからデータを受け取る
             while True:
                 i = room[name].recv(1024)
@@ -65,9 +65,10 @@ def match():
         print(osero.board)
         # 勝利判定
         judge_board = re.sub("\)|\(|\s", "", str(osero.judge_board()))
+        new_board = re.sub("\]|\[|\s", "", str(osero.board))
         for i in range(2):
             print(judge_board)
-            room[i].send(str(judge_board).encode())
+            room[i].send((judge_board + "," + new_board).encode())
     except Exception as e:
         print(e)
         room[0].close()
