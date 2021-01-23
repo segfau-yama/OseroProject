@@ -8,7 +8,7 @@ import re
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s: %(message)s')
 # サーバー関連
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = "127.0.0.1"
+host = ""
 port = 12345
 argument = (host, port)
 sock.bind(argument)
@@ -19,7 +19,7 @@ clients = []
 total_player = 2
 # バリアインスタンスを作る
 lock = threading.Lock()
-barrier = threading.Barrier(total_player, timeout=5)
+barrier = threading.Barrier(total_player, timeout=20)
 
 # 対戦ルームオセロ処理
 def match():
